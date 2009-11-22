@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarcraftAI", "StarcraftAI\StarcraftAI.csproj", "{095A7197-5BDD-4888-ABBE-382546214A02}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProxyBotLib", "..\..\StarProxyBot_net\ProxyBotLib.csproj", "{B6BAAB4D-F73C-41DC-B829-D18E10D24DAF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{095A7197-5BDD-4888-ABBE-382546214A02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{095A7197-5BDD-4888-ABBE-382546214A02}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{095A7197-5BDD-4888-ABBE-382546214A02}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{095A7197-5BDD-4888-ABBE-382546214A02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6BAAB4D-F73C-41DC-B829-D18E10D24DAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6BAAB4D-F73C-41DC-B829-D18E10D24DAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6BAAB4D-F73C-41DC-B829-D18E10D24DAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6BAAB4D-F73C-41DC-B829-D18E10D24DAF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
