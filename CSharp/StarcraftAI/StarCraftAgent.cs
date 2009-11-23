@@ -5,6 +5,9 @@ using ProxyBotLib.Agent;
 using ProxyBotLib;
 using ProxyBotLib.Types;
 using ProxyBotLib.Data;
+using StarcraftAI.GUI;
+using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace StarcraftAI
 {
@@ -22,6 +25,17 @@ namespace StarcraftAI
             this.proxyBot = pProxy;
 
 			int playerID = proxyBot.PlayerID;
+
+            //Fire up influence map
+            BackgroundWorker mapBG = new BackgroundWorker();
+            mapBG.DoWork += new DoWorkEventHandler((object sender, DoWorkEventArgs e) =>
+            {
+                InfluenceMap baseMap = new InfluenceMap(proxyBot.Map);
+                int[,] interestMap = InfluenceMap.SetInterestPoint(baseMap.Influence, 40, 64, 64);
+                InfluenceMapGUI imGui = new InfluenceMapGUI(interestMap);
+                Application.Run(imGui);
+            });
+            mapBG.RunWorkerAsync();
 			
 			while (true)
 			{

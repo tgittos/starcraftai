@@ -7,3 +7,8 @@ C:\Projects\Personal\starcraft\StarcraftAI\StarcraftAI\obj\Debug\StarcraftAI.exe
 C:\Projects\Personal\starcraft\StarcraftAI\StarcraftAI\obj\Debug\StarcraftAI.pdb
 C:\Projects\Personal\starcraft\StarcraftAI\CSharp\StarcraftAI\obj\Debug\StarcraftAI.exe
 C:\Projects\Personal\starcraft\StarcraftAI\CSharp\StarcraftAI\obj\Debug\StarcraftAI.pdb
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\StarcraftAI\bin\Debug\StarcraftAI.exe
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\StarcraftAI\bin\Debug\StarcraftAI.pdb
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\StarcraftAI\bin\Debug\ProxyBot.dll
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\StarcraftAI\bin\Debug\ProxyBot.pdb
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\StarcraftAI\obj\Debug\ResolveAssemblyReference.cache

@@ -14,6 +14,7 @@ namespace StarcraftAI
         {
             StarCraftAgent agent = new StarCraftAgent();
             ProxyBot proxyBot = new ProxyBot(agent);
+            proxyBot.showGUI = false;
 
             try
             {
