@@ -8,6 +8,9 @@ using System.Text;
 using System.Windows.Forms;
 using System.Drawing.Imaging;
 using System.Drawing.Drawing2D;
+using ProxyBotLib;
+using ProxyBotLib.Data;
+using ProxyBotLib.Types;
 
 namespace StarcraftAI.GUI
 {
@@ -30,7 +33,7 @@ namespace StarcraftAI.GUI
         private int[,] influence;
         private int tileSize = 3;
 
-        public InfluenceMapGUI(int[,] pInfluence)
+        public InfluenceMapGUI(int[,] pInfluence, ProxyBot bot)
         {
             InitializeComponent();
 
@@ -46,32 +49,38 @@ namespace StarcraftAI.GUI
             // Create new memory bitmap the same size as the picture box
             Bitmap bMap = new Bitmap(this.Width, this.Height);
 
-            // Initialize random number generator
-            Random rRand = new Random();
-
-            // Loop variables
-            int iX;
-            int iY;
-            byte iIntense;
-
-            // Lets loop 500 times and create a random point each iteration
-            for (int i = 0; i < 500; i++)
+            for (var mx = 0; mx < bot.Map.MapWidth; mx++)
             {
-                // Pick random locations and intensity
-                iX = rRand.Next(0, this.Width);
-                iY = rRand.Next(0, this.Height);
-                //Set the intensity as a random number between 0 and the width
-                iIntense = (byte)rRand.Next(1, 50);
+                for (var my = 0; my < bot.Map.MapHeight; my++)
+                {
+                    if (bot.Map.isWalkable(mx, my))
+                        HeatPoints.Add(new HeatPoint(mx * tileSize, my * tileSize, 5));
+                }
+            }
 
-                // Add heat point to heat points list
-                HeatPoints.Add(new HeatPoint(iX, iY, iIntense));
+            foreach (Unit u in bot.Units)
+            {
+                if (u.PlayerID != bot.PlayerID && u.Type.Center)
+                {
+                    //Enemy center
+                    HeatPoints.Add(new HeatPoint(u.X * tileSize, u.Y * tileSize, 100));
+                }
             }
 
             // Call CreateIntensityMask, give it the memory bitmap, and store the result back in the memory bitmap
             bMap = CreateIntensityMask(bMap, HeatPoints);
 
+            int[,] influenceMap = new int[this.Width, this.Height];
+            for (var x = 0; x < this.Width; x++)
+            {
+                for (var y = 0; y < this.Height; y++)
+                {
+                    influenceMap[x, y] = (int)Math.Floor(bMap.GetPixel(x, y).GetBrightness() * this.Width);
+                }
+            }
+
             // Colorize the memory bitmap and assign it as the picture boxes image
-            this.BackgroundImage = bMap;//Colorize(bMap, 255);
+            this.BackgroundImage = Colorize(bMap, 255);
         }      
         
         private Bitmap CreateIntensityMask(Bitmap bSurface, List<HeatPoint> aHeatPoints)

@@ -32,7 +32,7 @@ namespace StarcraftAI
             {
                 InfluenceMap baseMap = new InfluenceMap(proxyBot.Map);
                 int[,] interestMap = InfluenceMap.SetInterestPoint(baseMap.Influence, 40, 64, 64);
-                InfluenceMapGUI imGui = new InfluenceMapGUI(interestMap);
+                InfluenceMapGUI imGui = new InfluenceMapGUI(interestMap, proxyBot);
                 Application.Run(imGui);
             });
             mapBG.RunWorkerAsync();
