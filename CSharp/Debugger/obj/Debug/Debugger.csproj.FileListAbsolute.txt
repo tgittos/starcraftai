@@ -1,0 +1,12 @@
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\obj\Debug\ResolveAssemblyReference.cache
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\obj\Debug\Debugger.Properties.Resources.resources
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\obj\Debug\Debugger.csproj.GenerateResource.Cache
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\bin\Debug\Debugger.exe
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\bin\Debug\Debugger.pdb
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\bin\Debug\ProxyBot.dll
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\bin\Debug\StarcraftAI.exe
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\bin\Debug\ProxyBot.pdb
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\bin\Debug\StarcraftAI.pdb
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\obj\Debug\Debugger.exe
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\obj\Debug\Debugger.pdb
+C:\Projects\Personal\starcraft\StarcraftAI\CSharp\Debugger\obj\Debug\Debugger.Toolbar.resources

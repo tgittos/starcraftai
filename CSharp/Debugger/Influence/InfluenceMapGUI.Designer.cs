@@ -1,4 +1,4 @@
-﻿namespace StarcraftAI.GUI
+﻿namespace Debugger.Influence
 {
     partial class InfluenceMapGUI
     {

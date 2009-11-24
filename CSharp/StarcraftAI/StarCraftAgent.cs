@@ -5,7 +5,6 @@ using ProxyBotLib.Agent;
 using ProxyBotLib;
 using ProxyBotLib.Types;
 using ProxyBotLib.Data;
-using StarcraftAI.GUI;
 using System.ComponentModel;
 using System.Windows.Forms;
 
@@ -14,6 +13,8 @@ namespace StarcraftAI
 	/// <summary> Throw in your bot code here.</summary>
 	public class StarCraftAgent : IAgent
 	{
+        public InfluenceMap InfluenceMap { get; set; }
+
         private ProxyBot proxyBot;
 
         public StarCraftAgent()
@@ -27,15 +28,8 @@ namespace StarcraftAI
 			int playerID = proxyBot.PlayerID;
 
             //Fire up influence map
-            BackgroundWorker mapBG = new BackgroundWorker();
-            mapBG.DoWork += new DoWorkEventHandler((object sender, DoWorkEventArgs e) =>
-            {
-                InfluenceMap baseMap = new InfluenceMap(proxyBot.Map);
-                int[,] interestMap = InfluenceMap.SetInterestPoint(baseMap.Influence, 40, 64, 64);
-                InfluenceMapGUI imGui = new InfluenceMapGUI(interestMap, proxyBot);
-                Application.Run(imGui);
-            });
-            mapBG.RunWorkerAsync();
+            InfluenceMap = new InfluenceMap(proxyBot);
+            float[,] currentMap = null;
 			
 			while (true)
 			{
@@ -46,11 +40,68 @@ namespace StarcraftAI
 				catch (System.Exception)
 				{
 				}
+
+                if (currentMap == null)
+                {
+                    currentMap = InfluenceMap.GetMap(InfluenceMap.Terrain.GROUND, 50);
+                }
 				
 				foreach(Unit unit in proxyBot.Units)
 				{
-					
-					// make idle works mine				
+					//Send all units off to death!
+                    int x = 0;
+                    int y = 0;
+                    foreach (Unit u in proxyBot.Units)
+                    {
+                        if (u.PlayerID != playerID && u.Type.Center)
+                        {
+                            x = u.X;
+                            y = u.Y;
+                            break;
+                        }
+                    }
+                    if (unit.PlayerID == playerID && unit.Type.Worker &&
+                        unit.Order != (int)Order.Move)
+                    {
+                        proxyBot.rightClick(unit.ID, x, y);
+                    }
+                    /*
+                    //Experiment with influence map for navigation
+                    var ux = unit.X;
+                    var uy = unit.Y;
+                    float highestInfluence = 0f;
+                    int highestTileX = 0;
+                    int highestTileY = 0;
+                    //Look 10 tiles around
+                    for (var w = ux - 10; w <= ux + 10; w++)
+                    {
+                        for (var h = uy - 10; h <= uy + 10; h++)
+                        {
+                            if (w < 0 || w >= currentMap.GetLength(0) ||
+                                h < 0 || h >= currentMap.GetLength(1))
+                            {
+                                //Projected tile is off the screen
+                                continue;
+                            }
+                            if (currentMap[w, h] > highestInfluence)
+                            {
+                                highestTileX = w;
+                                highestTileY = h;
+                                highestInfluence = currentMap[w, h];
+                            }
+
+                        }
+                    }
+                    if (highestTileX != 0 && highestTileY != 0 && 
+                        unit.PlayerID == playerID && unit.Type.Worker &&
+                        unit.Order != (int)Order.Move)
+                    {
+                        proxyBot.rightClick(unit.ID, highestTileX, highestTileY);
+                    }
+                    */
+
+					// make idle works mine	
+			        /*
 					if (unit.PlayerID == playerID && unit.Type.Worker)
 					{
 						
@@ -82,6 +133,7 @@ namespace StarcraftAI
 							}
 						}
 					}
+                    */
 				}
 			}
 		}
