@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using ProxyBotLib.Data;
 using ProxyBotLib;
+using ProxyBotLib.Types;
 
 namespace StarcraftAI
 {
@@ -51,7 +52,20 @@ namespace StarcraftAI
             }
             return terrainMap;
         }
-        
+        public float[,] GetResourceMap(int influence)
+        {
+            float[,] map = GetMap(Terrain.GROUND);
+            foreach (Unit u in data.Units)
+            {
+                if (u.Type.ID == Constants.Resource_Mineral_Field ||
+                    u.Type.ID == Constants.Resource_Vespene_Geyser)
+                {
+                    map = SetInterestPoint(map, influence, u.X, u.Y);
+                }
+            }
+            return map;
+        }
+
         public static float[,] SetInterestPoint(float[,] influence, int weight, int x, int y)
         {
             //Determine radius of a circle with it's centre at x,y

@@ -7,6 +7,10 @@ using ProxyBotLib.Types;
 using ProxyBotLib.Data;
 using System.ComponentModel;
 using System.Windows.Forms;
+using System.Collections.Generic;
+using StarcraftAI.UnitAI;
+using System.Linq;
+using StarcraftAI.CommanderAI;
 
 namespace StarcraftAI
 {
@@ -27,113 +31,48 @@ namespace StarcraftAI
 
 			int playerID = proxyBot.PlayerID;
 
-            //Fire up influence map
-            InfluenceMap = new InfluenceMap(proxyBot);
-            float[,] currentMap = null;
+            //AI List
+            Dictionary<int, IUnitAgent> agents = new Dictionary<int, IUnitAgent>();
+
+            //Create the commander
+            Commander commander = new Commander();
 			
 			while (true)
 			{
 				try
 				{
-					System.Threading.Thread.Sleep(new System.TimeSpan((System.Int64) 10000 * 250));
+					//System.Threading.Thread.Sleep(new System.TimeSpan((System.Int64) 10000 * 250));
+                    System.Threading.Thread.Sleep(new System.TimeSpan((System.Int64)10000 * 500));
 				}
 				catch (System.Exception)
 				{
 				}
-
-                if (currentMap == null)
-                {
-                    currentMap = InfluenceMap.GetMap(InfluenceMap.Terrain.GROUND, 50);
-                }
 				
 				foreach(Unit unit in proxyBot.Units)
 				{
-					//Send all units off to death!
-                    int x = 0;
-                    int y = 0;
+                    //Attach an AI to any new unit
                     foreach (Unit u in proxyBot.Units)
                     {
-                        if (u.PlayerID != playerID && u.Type.Center)
+                        if (u.PlayerID == playerID)
                         {
-                            x = u.X;
-                            y = u.Y;
-                            break;
+                            if (!agents.Keys.Contains(u.ID))
+                            {
+                                agents.Add(u.ID, AgentFactory.AttachAgent(u));
+                            }
                         }
                     }
-                    if (unit.PlayerID == playerID && unit.Type.Worker &&
-                        unit.Order != (int)Order.Move)
-                    {
-                        proxyBot.rightClick(unit.ID, x, y);
-                    }
-                    /*
-                    //Experiment with influence map for navigation
-                    var ux = unit.X;
-                    var uy = unit.Y;
-                    float highestInfluence = 0f;
-                    int highestTileX = 0;
-                    int highestTileY = 0;
-                    //Look 10 tiles around
-                    for (var w = ux - 10; w <= ux + 10; w++)
-                    {
-                        for (var h = uy - 10; h <= uy + 10; h++)
-                        {
-                            if (w < 0 || w >= currentMap.GetLength(0) ||
-                                h < 0 || h >= currentMap.GetLength(1))
-                            {
-                                //Projected tile is off the screen
-                                continue;
-                            }
-                            if (currentMap[w, h] > highestInfluence)
-                            {
-                                highestTileX = w;
-                                highestTileY = h;
-                                highestInfluence = currentMap[w, h];
-                            }
 
+                    //Update from command centre
+                    commander.Update(proxyBot, agents);
+
+                    //Update the unit agents
+                    foreach (KeyValuePair<int, IUnitAgent> kvp in agents)
+                    {
+                        if (kvp.Value != null)
+                        {
+                            kvp.Value.Update(proxyBot);
                         }
                     }
-                    if (highestTileX != 0 && highestTileY != 0 && 
-                        unit.PlayerID == playerID && unit.Type.Worker &&
-                        unit.Order != (int)Order.Move)
-                    {
-                        proxyBot.rightClick(unit.ID, highestTileX, highestTileY);
-                    }
-                    */
-
-					// make idle works mine	
-			        /*
-					if (unit.PlayerID == playerID && unit.Type.Worker)
-					{
-						
-						if (unit.Order == Convert.ToInt32(Order.PlayerGuard))
-						{
-							int closestID = - 1;
-							//UPGRADE_TODO: The equivalent in .NET for field 'java.lang.Double.MAX_VALUE' may return a different value. "ms-help://MS.VSCC.v80/dv_commoner/local/redirect.htm?index='!DefaultContextWindowIndex'&keyword='jlca1043'"
-							double closest = System.Double.MaxValue;
-							
-							foreach(Unit patch in proxyBot.Units)
-							{
-								
-								if (patch.Type.ID == Constants.Resource_Mineral_Field)
-								{
-									
-									double distance = (0.5 + new Random().NextDouble()) * unit.distance(patch);
-									if (distance < closest)
-									{
-										closest = distance;
-										closestID = patch.ID;
-									}
-								}
-							}
-							
-							if (closestID != - 1)
-							{
-								//System.Console.Out.WriteLine("Right on patch: " + unit.ID + " " + closestID);
-								proxyBot.rightClick(unit.ID, closestID);
-							}
-						}
-					}
-                    */
 				}
 			}
 		}

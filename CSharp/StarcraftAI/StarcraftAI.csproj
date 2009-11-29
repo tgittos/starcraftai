@@ -47,20 +47,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommanderAI\Commander.cs" />
     <Compile Include="InfluenceMap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RGBHSL.cs" />
     <Compile Include="StarCraftAgent.cs" />
+    <Compile Include="UnitAI\AgentFactory.cs" />
+    <Compile Include="UnitAI\Worker.cs" />
+    <Compile Include="UnitAI\IUnitAgent.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\StarProxyBot_net\ProxyBotLib.csproj">
       <Project>{B6BAAB4D-F73C-41DC-B829-D18E10D24DAF}</Project>
       <Name>ProxyBotLib</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="pallet.bmp" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
