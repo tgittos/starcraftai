@@ -26,7 +26,8 @@ namespace StarcraftAI.UnitAI
         private State currentState;
         private ProxyBot bot;
         private Point destination;
-        private int buildingID;
+        private int buildingType;
+        private int buildingCount;
 
         public Worker(Unit u)
         {
@@ -40,22 +41,27 @@ namespace StarcraftAI.UnitAI
         {
             //Update data
             bot = pBot;
+            int updatedCount = 0;
             foreach (Unit u in bot.Units)
             {
                 if (u.ID == unitID)
                 {
                     unit = u;
-                    break;
+                }
+                if (buildingType > 0 && u.Type.ID == buildingType)
+                {
+                    updatedCount++;
                 }
             }
 
-            //updateStateIfIdle();
+            checkIfFinishedBuilding(updatedCount);
 
             if (currentState == State.IDLE)
             {
                 //Figure out what to do, considering where the unit is
                 //what's going on in the game, and what units are near it
                 //For now, hard code it to mine
+                Console.Out.WriteLine("[Worker] Mining");
                 Mine();
             }
             else if (currentState == State.MOVING)
@@ -64,10 +70,18 @@ namespace StarcraftAI.UnitAI
                 updateStateForBuilding();
             }
         }
+
         public void Build(int unitType, int x, int y)
         {
             destination = new Point(x, y);
-            buildingID = unitType;
+            int currentCount = 0;
+            foreach (Unit u in bot.Units)
+            {
+                if (unit.Type.ID == unitType)
+                    currentCount++;
+            }
+            buildingType = unitType;
+            buildingCount = currentCount;
             Console.Out.WriteLine("[Worker] Told to build " + unitType + " at " + x + ", " + y);
             updateStateForBuilding();
         }
@@ -78,8 +92,8 @@ namespace StarcraftAI.UnitAI
             List<Unit> resources = new List<Unit>();
             foreach (Unit u in bot.Units)
             {
-                if (u.Type.ID == Constants.Resource_Mineral_Field ||
-                    u.Type.ID == Constants.Resource_Vespene_Geyser)
+                if (u.Type.ID == Constants.Resource_Mineral_Field/* ||
+                    u.Type.ID == Constants.Resource_Vespene_Geyser*/)
                 {
                     resources.Add(u);
                 }
@@ -113,17 +127,6 @@ namespace StarcraftAI.UnitAI
             mineMinerals(resource);
         }
 
-        private void updateStateIfIdle()
-        {
-            if (unit.Order == (int)Order.Neutral ||
-                unit.Order == (int)Order.None ||
-                unit.Order == (int)Order.Nothing1 ||
-                unit.Order == (int)Order.Nothing2 ||
-                unit.Order == (int)Order.Nothing3)
-            {
-                currentState = State.IDLE;
-            }
-        }
         private void updateStateForBuilding()
         {
             int dx = Math.Abs(destination.X - unit.X);
@@ -134,7 +137,7 @@ namespace StarcraftAI.UnitAI
             if (currentState != State.BUILDING && closeEnough)
             {
                 currentState = State.BUILDING;
-                bot.build(unit.ID, destination.X, destination.Y, buildingID);
+                bot.build(unit.ID, destination.X, destination.Y, buildingType);
             }
             else if (currentState != State.MOVING && currentState != State.BUILDING)
             {
@@ -195,6 +198,17 @@ namespace StarcraftAI.UnitAI
             else
             {
                 return 0;
+            }
+        }
+        private void checkIfFinishedBuilding(int updatedCount)
+        {
+            if (updatedCount - buildingCount > 0 &&
+                unit.Order == (int)Order.PlayerGuard)
+            {
+                Console.Out.WriteLine("[Worker] Finished building");
+                buildingType = 0;
+                buildingCount = 0;
+                currentState = State.IDLE;
             }
         }
     }
