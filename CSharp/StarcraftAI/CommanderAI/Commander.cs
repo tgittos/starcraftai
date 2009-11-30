@@ -12,46 +12,71 @@ namespace StarcraftAI.CommanderAI
     public class Commander
     {
         private Unit center;
-        private Dictionary<int, Unit> units;
-        private Dictionary<int, Unit> buildings;
+        private List<Unit> units;
+        private List<Unit> buildings;
         private List<int> currentlyBuilding;
 
         public Commander()
         {
-            units = new Dictionary<int, Unit>();
-            buildings = new Dictionary<int, Unit>();
+            units = new List<Unit>();
+            buildings = new List<Unit>();
             currentlyBuilding = new List<int>();
         }
 
         public void Update(ProxyBot bot, Dictionary<int, IUnitAgent> agents)
         {
             //Track units
-            foreach(Unit u in bot.Units)
-            {
-                if (!units.Keys.Contains(u.ID))
-                {
-                    units.Add(u.ID, u);
-                }
-                else
-                {
-                    units[u.ID] = u;
-                }
-            }
+            updateUnits(bot);
 
             //Assign the center if we haven't done so
             if (center == null)
             {
-                center = (from u in units.Values
-                          where u.Type.Center && u.PlayerID == bot.PlayerID
-                          select u).Single();
+                center = (from b in buildings
+                          where b.Type.Center
+                          select b).Single();
             }
 
-            //TODO: Work on this, it's dodgy as
-            var barracks = (from b in buildings.Values
+            //If we have no barracks, build one
+            buildBarracksIfNeeded(bot, agents);
+            
+            //If we have a barracks, and can affort marines, build some
+            buildMarines(bot);
+        }
+        public void FinishedBuilding(int typeID)
+        {
+            Console.Out.WriteLine("[Commander] Finished building");
+            currentlyBuilding.Remove(typeID);
+        }
+
+        private void buildMarines(ProxyBot bot)
+        {
+            if (bot.Player.SupplyUsed < bot.Player.SupplyTotal &&
+                bot.Player.Minerals > bot.unitTypes[Constants.Terran_Marine].MineralsCost + 100 &&
+                !currentlyBuilding.Contains(Constants.Terran_Marine))
+            {
+                int barracksCount = (from b in buildings
+                                     where b.Type.ID == Constants.Terran_Barracks
+                                     select b).Count();
+                if (barracksCount > 0 && 
+                    !currentlyBuilding.Contains(Constants.Terran_Barracks))
+                {
+                    int barracksID = (from b in buildings
+                                      where b.Type.ID == Constants.Terran_Barracks
+                                      select b.ID).Single();
+                    currentlyBuilding.Add(Constants.Terran_Marine);
+                    bot.train(barracksID, Constants.Terran_Marine);
+                }
+            }
+        }
+
+        private void buildBarracksIfNeeded(ProxyBot bot, Dictionary<int, IUnitAgent> agents)
+        {
+            var barracks = (from b in buildings
                             where b.Type.ID == Constants.Terran_Barracks &&
                             b.PlayerID == bot.PlayerID
                             select b).ToList();
-            if (barracks.Count == 0 && !currentlyBuilding.Contains(Constants.Terran_Barracks))
+            if (barracks.Count == 0 &&
+                !currentlyBuilding.Contains(Constants.Terran_Barracks))
             {
                 //Check if we have enough resources for a barracks
                 if (bot.Player.Race == Constants.Terran)
@@ -96,6 +121,7 @@ namespace StarcraftAI.CommanderAI
                         {
                             Unit u = getNearestWorker();
                             Worker workerAI = agents[u.ID] as Worker;
+                            Console.Out.WriteLine("[Commander] Building barracks");
                             workerAI.Build(Constants.Terran_Barracks, x, y);
                             currentlyBuilding.Add(Constants.Terran_Barracks);
                         }
@@ -104,19 +130,43 @@ namespace StarcraftAI.CommanderAI
             }
         }
 
+        private void updateUnits(ProxyBot bot)
+        {
+            //Reset the units
+            units = new List<Unit>();
+            buildings = new List<Unit>();
+
+            foreach (Unit u in bot.Units)
+            {
+                if (u.PlayerID == bot.PlayerID)
+                {
+                    if (!u.Type.Building &&
+                        u.Type.ID != Constants.Resource_Mineral_Field &&
+                        u.Type.ID != Constants.Resource_Vespene_Geyser)
+                    {
+                        units.Add(u);
+                    }
+
+                    if (u.Type.Building)
+                    {
+                        buildings.Add(u);
+                    }
+                }
+            }
+        }
+
         private Unit getNearestWorker()
         {
             //Get the worker nearest to the command centre
-            List<Unit> sortableUnits = units.Values.ToList();
-            sortableUnits.Sort((Unit u1, Unit u2) =>
+            units.Sort((Unit u1, Unit u2) =>
             {
                 double d1 = u1.distance(center);
                 double d2 = u2.distance(center);
                 return d1.CompareTo(d2);
             });
-            return (from u in sortableUnits
+            return (from u in units
                     where u.Type.Worker
-                    select units[u.ID]).First();
+                    select u).First();
         }
     }
 }

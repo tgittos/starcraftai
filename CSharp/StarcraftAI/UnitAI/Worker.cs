@@ -7,6 +7,7 @@ using ProxyBotLib;
 using Order = ProxyBotLib.Types.Constants.Order;
 using System.Drawing;
 using ProxyBotLib.Types;
+using StarcraftAI.CommanderAI;
 
 namespace StarcraftAI.UnitAI
 {
@@ -28,10 +29,12 @@ namespace StarcraftAI.UnitAI
         private Point destination;
         private int buildingType;
         private int buildingCount;
+        private Commander commander;
 
-        public Worker(Unit u)
+        public Worker(Unit u, Commander c)
         {
             unitID = u.ID;
+            commander = c;
             unit = u;
             unitResources = new Dictionary<int, int>();
             currentState = State.IDLE;
@@ -92,8 +95,8 @@ namespace StarcraftAI.UnitAI
             List<Unit> resources = new List<Unit>();
             foreach (Unit u in bot.Units)
             {
-                if (u.Type.ID == Constants.Resource_Mineral_Field/* ||
-                    u.Type.ID == Constants.Resource_Vespene_Geyser*/)
+                if (u.Type.ID == Constants.Resource_Mineral_Field ||
+                    u.Type.ID == Constants.Resource_Vespene_Geyser)
                 {
                     resources.Add(u);
                 }
@@ -110,7 +113,6 @@ namespace StarcraftAI.UnitAI
                 }
                 else if (resource.Type.ID == Constants.Resource_Vespene_Geyser)
                 {
-                    //TODO: Do this
                     mineGas(resource);
                     break;
                 }
@@ -154,8 +156,9 @@ namespace StarcraftAI.UnitAI
         {
             if (bot.Player.Minerals > bot.unitTypes[Constants.Terran_Refinery].MineralsCost)
             {
+                Console.Out.WriteLine("[Worker] Trying to build " + Constants.Terran_Refinery + " at " + resource.X + "," + resource.Y);
                 unitResources.Add(resource.ID, unit.ID);
-                bot.build(unit.ID, resource.X, resource.Y, Constants.Terran_Refinery);
+                bot.build(unit.ID, resource.X - 2, resource.Y - 1, Constants.Terran_Refinery);
             }
             else
             {
@@ -206,6 +209,7 @@ namespace StarcraftAI.UnitAI
                 unit.Order == (int)Order.PlayerGuard)
             {
                 Console.Out.WriteLine("[Worker] Finished building");
+                commander.FinishedBuilding(buildingType);
                 buildingType = 0;
                 buildingCount = 0;
                 currentState = State.IDLE;

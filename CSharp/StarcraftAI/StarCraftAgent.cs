@@ -57,7 +57,7 @@ namespace StarcraftAI
                         {
                             if (!agents.Keys.Contains(u.ID))
                             {
-                                agents.Add(u.ID, AgentFactory.AttachAgent(u));
+                                agents.Add(u.ID, AgentFactory.AttachAgent(u, commander));
                             }
                         }
                     }
